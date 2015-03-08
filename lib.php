@@ -164,6 +164,7 @@ class ArtefactTyperubric extends ArtefactType {
     			$fordb->{'standard'} = $cell->standard;
     			$fordb->{'year'} = $year->id;
     			$fordb->{'comment'} = '';
+    			$fordb->{'default_flg'} = 0;
     			insert_record('artefact_rubric_score', $fordb);
     		}
     	}
@@ -382,7 +383,13 @@ class ArtefactTyperubric extends ArtefactType {
     // --> SCSK ADD 2014.12.22
     public static function get_statistics_data($rubric, $year) {
 
-    	$records = get_records_sql_array("SELECT sc.usr, concat(u.firstname, ' ', u.lastname) AS name,
+      if ( is_mysql() ) {
+	$full_name = "concat(u.firstname, ' ', u.lastname)";
+      } else {
+	$full_name = "u.firstname||' '||u.lastname";
+      }
+
+    	$records = get_records_sql_array("SELECT sc.usr, $full_name AS name,
     			st.id AS standard, CASE WHEN sc.default_flg = 1 THEN st.point ELSE 0 END AS point,
     			ye.id AS year, ye.title AS ytitle, sk.id AS skill, sk.title AS stitle, sc.default_flg,
     			CASE WHEN sc.default_flg = 1 THEN ce.label ELSE '-' END AS label, st.bgcolor
@@ -513,14 +520,30 @@ class ArtefactTyperubric extends ArtefactType {
 
     public static function get_score_musr_mtime($score) {
 
-    	return get_record_sql("SELECT CONCAT(u.firstname, ' ', u.lastname) AS name, DATE_FORMAT(mtime, '%Y/%m/%d %k:%i') AS date FROM usr u
+      if ( is_mysql() ) {
+	$full_name = "concat(u.firstname, ' ', u.lastname)";
+	$date_format = "DATE_FORMAT(mtime, '%Y/%m/%d %k:%i')";
+      } else {
+	$full_name = "u.firstname||' '||u.lastname";
+	$date_format = "to_char(mtime,'YYYY/MM/DD HH:MI')";
+      }
+
+    	return get_record_sql("SELECT $full_name AS name, $date_format AS date FROM usr u
 						INNER JOIN artefact_rubric_score s ON s.musr = u.id
 						WHERE s.id = ?", array($score));
     }
 
     public static function get_evidence_musr_mtime($score) {
 
-    	return get_record_sql("SELECT CONCAT(u.firstname, ' ', u.lastname) AS name, DATE_FORMAT(e.mtime, '%Y/%m/%d %k:%i') AS date FROM usr u
+      if ( is_mysql() ) {
+	$full_name = "concat(u.firstname, ' ', u.lastname)";
+	$date_format = "DATE_FORMAT(e.mtime, '%Y/%m/%d %k:%i')";
+      } else {
+	$full_name = "u.firstname||' '||u.lastname";
+	$date_format = "to_char(e.mtime,'YYYY/MM/DD HH:MI')";
+      }
+
+    	return get_record_sql("SELECT $full_name AS name, $date_format AS date FROM usr u
 						INNER JOIN artefact_rubric_evidence e ON e.musr = u.id
 						WHERE e.score = ? ORDER BY e.mtime DESC LIMIT 1", array($score));
     }

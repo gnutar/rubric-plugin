@@ -407,7 +407,7 @@ function get_rubric_base($rubric, $id) {
 			INNER JOIN {artefact_rubric_year} y ON r.id = y.rubric
 			WHERE r.id = ?
 			AND s.id = (SELECT MAX(skill) FROM {artefact_rubric_score} WHERE id = ?)
-			AND y.id = (SELECT MAX(year) FROM `artefact_rubric_score` WHERE id = ?)"
+			AND y.id = (SELECT MAX(year) FROM {artefact_rubric_score} WHERE id = ?)"
 			, array($rubric, $id, $id)) ;
 }
 

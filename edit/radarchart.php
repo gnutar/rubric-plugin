@@ -138,7 +138,7 @@ $myPicture->stroke();
 
 //評価基準
 function get_standard_maxpoint($id) {
-	$result = get_records_sql_array("SELECT MAX(point) point FROM {artefact_rubric_standard} WHERE rubric = ? ORDER BY id", array($id)) ;
+	$result = get_records_sql_array("SELECT MAX(point) point FROM {artefact_rubric_standard} WHERE rubric = ?", array($id)) ;
 	return $result[0]->point;
 }
 
